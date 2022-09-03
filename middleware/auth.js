@@ -21,6 +21,7 @@ function authenticateJWT(req, res, next) {
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
+      console.log("55555555", res.locals.user.isAdmin)
     }
     return next();
   } catch (err) {
@@ -42,8 +43,38 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/** Middleware to use when user must be logged in as admin.
+ *
+ * If not, raises Unauthorized.
+ */
+
+function requireAdmin(req, res, next) {
+  try {
+    if (!res.locals.user.isAdmin) throw new UnauthorizedError("You must be an admin to access this feature.");
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+function correctUserOrAdmin(req, res, next) {
+  try {
+    const loggedInUser = res.locals.user.username;
+    if (!res.locals.user.isAdmin && req.params.username !== loggedInUser) {
+      throw new UnauthorizedError("You must be an admin or signed in as the user whose information you are trying to access.");
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
+
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  requireAdmin,
+  correctUserOrAdmin
 };
