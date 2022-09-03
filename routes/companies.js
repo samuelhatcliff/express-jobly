@@ -63,11 +63,15 @@ router.get("/", async function (req, res, next) {
     const { name, minEmployees, maxEmployees } = req.query;
     let filters = [];
     for (let property of Object.keys(req.query)) { // creates an array of objects containing property of filter type and their respective values
+      //ensures that no invalid property names are present before making the sql query
       if (property !== "name" && property !== "minEmployees" && property !== "maxEmployees") {
         throw new BadRequestError(`Request contains invalid query parameter ${property}
           Please only use the following valid parameters: name, minEmployees, maxEmployees`)
       }
-      filters.push(`${property}:${req.query[property]}`)
+      const value = req.query[property];
+      const newObj = {};
+      newObj[property] = value;
+      filters.push(newObj)
     }
     if (minEmployees && maxEmployees) { // checks if min employees is greater than max employees
       if (parseInt(minEmployees) > parseInt(maxEmployees))
