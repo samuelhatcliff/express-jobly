@@ -9,13 +9,10 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   //Example: {"firstName": "first", "lastName": "last"} => [ 'first', 'last' ]
   const keys = Object.keys(dataToUpdate);
   if (keys.length === 0) throw new BadRequestError("No data");
-  console.log("KEys", keys)
   //Example: {firstName: 'Aliya', age: 32} => ['"first_name"=$1', '"age"=$2']
   const cols = keys.map((colName, idx) =>
     `"${jsToSql[colName] || colName}"=$${idx + 1}`,
   );
-  console.log(cols.join(", "), "setCols")
-  console.log("values", Object.values(dataToUpdate))
   return {
     setCols: cols.join(", "),
     values: Object.values(dataToUpdate),

@@ -87,6 +87,21 @@ class Company {
     return company;
   }
 
+  static async filterBy(filters) {
+    const cols = [];
+    const vals = [];
+    for (let filter of filters) {
+      const col = Object.keys(filter);
+      cols.push(col);
+      vals.push(filter[col]);
+    }
+    const setCols = cols.join(", ")
+    // const companiesRes = 
+
+    if (!companiesRes) throw new NotFoundError("Couldn't find company that matched search criteria!");
+    return companiesRes
+  }
+
   /** Update company data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain all the
