@@ -31,7 +31,7 @@ describe("create", function () {
     expect(company).toEqual(newCompany);
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'new'`);
     expect(result.rows).toEqual([
@@ -87,6 +87,42 @@ describe("findAll", function () {
   });
 });
 
+/************************************** filterBy */
+
+describe("filterBy", function () {
+  test("not found if no such company", async function () {
+    try {
+      const filters = [{ name: 'hmm' }, { minEmployees: '5' }, { maxEmployees: '200' }]
+      await Company.filterBy(filters);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+  test("Only include neccessary SELECT values", async function () {
+    let filters = [{ minEmployees: '1' }, { maxEmployees: '500' }]
+    let company = await Company.filterBy(filters);
+    expect(company[0]).not.toHaveProperty('name')
+    filters = [{ name: 'C1' }];
+    company = await Company.filterBy(filters);
+    expect(company[0]).not.toHaveProperty('num_employees')
+  })
+  test("case-insensitivety ", async function () {
+    let filters = [{ name: 'C1' }];
+    let company = await Company.filterBy(filters);
+    expect(company).toBeTruthy();
+  })
+  test("accurate retreival", async function () {
+    let filters = [{ minEmployees: '1' }, { maxEmployees: '2' }];
+    let company = await Company.filterBy(filters)
+    company = JSON.stringify(company);
+    expect(company).toEqual(expect.not.stringContaining("numEmployees: 3"))
+    filters = [{ minEmployees: '2' }, { maxEmployees: '3' }];
+    company = await Company.filterBy(filters)
+    expect(company).toEqual(expect.not.stringContaining("numEmployees: 1"))
+  })
+});
+
 /************************************** get */
 
 describe("get", function () {
@@ -99,15 +135,6 @@ describe("get", function () {
       numEmployees: 1,
       logoUrl: "http://c1.img",
     });
-  });
-
-  test("not found if no such company", async function () {
-    try {
-      await Company.get("nope");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
   });
 });
 
@@ -129,7 +156,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -156,7 +183,7 @@ describe("update", function () {
     });
 
     const result = await db.query(
-          `SELECT handle, name, description, num_employees, logo_url
+      `SELECT handle, name, description, num_employees, logo_url
            FROM companies
            WHERE handle = 'c1'`);
     expect(result.rows).toEqual([{
@@ -193,7 +220,7 @@ describe("remove", function () {
   test("works", async function () {
     await Company.remove("c1");
     const res = await db.query(
-        "SELECT handle FROM companies WHERE handle='c1'");
+      "SELECT handle FROM companies WHERE handle='c1'");
     expect(res.rows.length).toEqual(0);
   });
 

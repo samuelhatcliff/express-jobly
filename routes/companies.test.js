@@ -110,7 +110,7 @@ describe("GET /companies", function () {
   //NEW TESTS
   test("tests query filters", async function () {
     const resp = await request(app)
-      .get("/companies?minEmployees=600&maxEmployees=700")
+      .get("/companies?minEmployees=1&maxEmployees=7000")
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(200);
   })
@@ -130,10 +130,15 @@ describe("GET /companies", function () {
     const resp = await request(app)
       .get("/companies?name=invalidnameforcompany")
       .set("authorization", `Bearer ${u1Token}`);
-    expect(resp.statusCode).toEqual(200);
+    expect(resp.statusCode).toEqual(404);
+    console.log("^66666666", resp.body)
     expect(resp.body).toEqual({
-      "companies": []
-    })
+      error: {
+        message: "Couldn't find company that matched search criteria.",
+        status: 404
+      }
+    }
+    )
   })
 });
 
