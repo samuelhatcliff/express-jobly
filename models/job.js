@@ -74,41 +74,44 @@ class Job {
         return job;
     }
 
-    // static async filterBy(filters) {
-    //     const wheres = []; //where statements based on filters
-    //     const vals = []; //vals to be matched with param ids
-    //     let numEmployees = ''; //num_employees won't be part of SELECT query if not needed
-    //     let name = ''; //name won't be part of SELECT query if not needed
-    //     filters.forEach((filter, idx) => { //creates WHERE statement for query and array of values to match with param ids
-    //         const col = Object.keys(filter);
-    //         if (col[0] === 'minEmployees') {
-    //             wheres.push(`num_employees >= $${idx + 1}`);
-    //             vals.push(filter[col]);
-    //             numEmployees = ',num_employees' //add num_employees to SELECT query
-    //         }
-    //         if (col[0] === 'maxEmployees') {
-    //             wheres.push(`num_employees <= $${idx + 1}`);
-    //             vals.push(filter[col]);
-    //             numEmployees = ',num_employees'
-    //         }
-    //         if (col[0] === 'name') {
-    //             wheres.push(`name ILIKE $${idx + 1}`);
-    //             vals.push(filter[col]);
-    //             name = ',name'
-    //         }
-    //     })
-    //     //create SQL query based on above information
-    //     let query = `SELECT handle
-    // ${name}
-    // ${numEmployees}
-    // FROM companies`;
-    //     query += " WHERE " + wheres.join(" AND ") + " ORDER BY name";
-    //     const queryRes = await db.query(query, vals);
-    //     const companiesRes = queryRes.rows
-    //     if (companiesRes.length === 0) throw new NotFoundError("Couldn't find company that matched search criteria.");
-    //     console.log(companiesRes[0], "LLLLLLL", typeof companiesRes)
-    //     return companiesRes
-    // }
+
+    static async filterBy(filters) {
+        let paramId = 0;
+        const wheres = []; //where statements based on filters
+        const vals = []; //vals to be matched with param ids
+        filters.forEach((filter) => { //creates WHERE statement for query and array of values to match with param ids
+            const col = Object.keys(filter);
+            if (col[0] === 'hasEquity') {
+                if (filter[col] === 'true') {
+                    wheres.push(`equity > 0`);
+                }
+            }
+            if (col[0] === 'minSalary') {
+                wheres.push(`salary >= $${paramId + 1}`);
+                vals.push(filter[col]);
+                paramId++;
+            }
+            if (col[0] === 'title') {
+                wheres.push(`title ILIKE $${paramId + 1}`);
+                vals.push(filter[col]);
+                paramId++;
+            }
+        })
+        //create SQL query based on above information
+        let query = `SELECT id,
+    title,
+    salary,
+    equity,
+    company_handle
+    FROM jobs`;
+        query += " WHERE " + wheres.join(" AND ") + " ORDER BY company_handle";
+        const queryRes = await db.query(query, vals);
+        const jobsRes = queryRes.rows
+        if (jobsRes.length === 0) {
+            throw new NotFoundError("Couldn't find and jobs that matched search criteria.");
+        }
+        return jobsRes
+    }
 
     /** Update job data with `data`.
      *

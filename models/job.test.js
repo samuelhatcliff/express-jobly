@@ -79,39 +79,42 @@ describe("findAll", function () {
 
 // /************************************** filterBy */
 
-// describe("filterBy", function () {
-//     test("not found if no such company", async function () {
-//         try {
-//             const filters = [{ name: 'hmm' }, { minEmployees: '5' }, { maxEmployees: '200' }]
-//             await Company.filterBy(filters);
-//             fail();
-//         } catch (err) {
-//             expect(err instanceof NotFoundError).toBeTruthy();
-//         }
-//     });
-//     test("Only include neccessary SELECT values", async function () {
-//         let filters = [{ minEmployees: '1' }, { maxEmployees: '500' }]
-//         let company = await Company.filterBy(filters);
-//         expect(company[0]).not.toHaveProperty('name')
-//         filters = [{ name: 'C1' }];
-//         company = await Company.filterBy(filters);
-//         expect(company[0]).not.toHaveProperty('num_employees')
-//     })
-//     test("case-insensitivety ", async function () {
-//         let filters = [{ name: 'C1' }];
-//         let company = await Company.filterBy(filters);
-//         expect(company).toBeTruthy();
-//     })
-//     test("accurate retreival", async function () {
-//         let filters = [{ minEmployees: '1' }, { maxEmployees: '2' }];
-//         let company = await Company.filterBy(filters)
-//         company = JSON.stringify(company);
-//         expect(company).toEqual(expect.not.stringContaining("numEmployees: 3"))
-//         filters = [{ minEmployees: '2' }, { maxEmployees: '3' }];
-//         company = await Company.filterBy(filters)
-//         expect(company).toEqual(expect.not.stringContaining("numEmployees: 1"))
-//     })
-// });
+describe("filterBy", function () {
+    test("not found if no such job", async function () {
+        try {
+            const filters = [{ title: 'nosuchjobb' }, { hasEquity: true }, { minSalary: 0 }]
+            await Job.filterBy(filters);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+    test("case-insensitivety ", async function () {
+        let filters = [{ title: 'JOB1' }];
+        let job = await Job.filterBy(filters);
+        expect(job).toBeTruthy();
+    })
+    test("accurate retrieval", async function () {
+        let filters = [{ title: 'Job2' }, { hasEquity: true }, { minSalary: 0 }];
+        let job = await Job.filterBy(filters)
+        expect(job).toEqual([{
+            "company_handle": "c1",
+            "equity": "0.2",
+            "id": expect.any(Number),
+            "salary": 200,
+            "title": "Job2"
+        }])
+        filters = [{ hasEquity: false }, { minSalary: 250 }]
+        job = await Job.filterBy(filters)
+        expect(job).toEqual([{
+            "company_handle": "c1",
+            "equity": "0",
+            "id": expect.any(Number),
+            "salary": 300,
+            "title": "Job3"
+        }])
+    })
+});
 
 // /************************************** get */
 

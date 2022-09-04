@@ -119,7 +119,6 @@ class Company {
     const queryRes = await db.query(query, vals);
     const companiesRes = queryRes.rows
     if (companiesRes.length === 0) throw new NotFoundError("Couldn't find company that matched search criteria.");
-    console.log(companiesRes[0], "LLLLLLL", typeof companiesRes)
     return companiesRes
   }
 

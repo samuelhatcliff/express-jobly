@@ -44,11 +44,32 @@ router.post("/", ensureLoggedIn, requireAdmin, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-    try {
-        const jobs = await Job.findAll();
-        return res.json({ jobs });
-    } catch (err) {
-        return next(err);
+    if (Object.keys(req.query).length === 0) { //checks if no filters are specified in q string
+        try {
+            const jobs = await Job.findAll();
+            return res.json({ jobs });
+        } catch (err) {
+            return next(err);
+        }
+    } else {
+        try {
+            let filters = [];
+            for (let property of Object.keys(req.query)) { // creates an array of objects containing property of filter type and their respective values
+                //ensures that no invalid property names are present before making the sql query
+                if (property !== "title" && property !== "minSalary" && property !== "hasEquity") {
+                    throw new BadRequestError(`Request contains invalid query parameter ${property}
+            Please only use the following valid parameters: title, minSalary, hasEquity`)
+                }
+                const value = req.query[property];
+                const newObj = {};
+                newObj[property] = value;
+                filters.push(newObj)
+            }
+            const jobs = await Job.filterBy(filters);
+            return res.json({ jobs })
+        } catch (err) {
+            return next(err);
+        }
     }
 });
 

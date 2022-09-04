@@ -145,6 +145,25 @@ describe("GET /jobs/:id", function () {
         const resp = await request(app).get(`/jobs/9999999`);
         expect(resp.statusCode).toEqual(404);
     });
+
+    test("tests query filters", async function () {
+        const resp = await request(app)
+            .get("/jobs?minSalary=1&hasEquity=true")
+            .set("authorization", `Bearer ${u1Token}`);
+        expect(resp.statusCode).toEqual(200);
+    })
+    test("only accepts valid filters", async function () {
+        const resp = await request(app)
+            .get("/jobs?invalid=600&maxEmployees=700")
+            .set("authorization", `Bearer ${u1Token}`);
+        expect(resp.statusCode).toEqual(400);
+    })
+    // test("min can't be greater than max", async function () {
+    //     const resp = await request(app)
+    //         .get("/companies?minEmployees=800&maxEmployees=700")
+    //         .set("authorization", `Bearer ${u1Token}`);
+    //     expect(resp.statusCode).toEqual(400);
+    // })
 });
 
 /************************************** PATCH /jobs/:handle */
