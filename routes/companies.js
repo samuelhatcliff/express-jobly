@@ -21,7 +21,7 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: login, admin
  */
 
 router.post("/", ensureLoggedIn, requireAdmin, async function (req, res, next) {
@@ -31,7 +31,6 @@ router.post("/", ensureLoggedIn, requireAdmin, async function (req, res, next) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-
     const company = await Company.create(req.body);
     return res.status(201).json({ company });
   } catch (err) {
@@ -112,7 +111,7 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login
+ * Authorization required: login, admin
  */
 
 router.patch("/:handle", ensureLoggedIn, requireAdmin, async function (req, res, next) {
@@ -122,7 +121,6 @@ router.patch("/:handle", ensureLoggedIn, requireAdmin, async function (req, res,
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
-
     const company = await Company.update(req.params.handle, req.body);
     return res.json({ company });
   } catch (err) {
@@ -132,7 +130,7 @@ router.patch("/:handle", ensureLoggedIn, requireAdmin, async function (req, res,
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login
+ * Authorization: login, admin
  */
 
 router.delete("/:handle", ensureLoggedIn, requireAdmin, async function (req, res, next) {

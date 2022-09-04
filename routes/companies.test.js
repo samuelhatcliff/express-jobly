@@ -29,7 +29,7 @@ describe("POST /companies", function () {
     description: "DescNew",
     numEmployees: 10,
   };
-
+  //Authorization
   test("unauthorized for user who isn't admin", async function () {
     const resp = await request(app)
       .post("/companies")
@@ -49,7 +49,7 @@ describe("POST /companies", function () {
     });
   });
 
-
+  //Schema
   test("bad request with missing data", async function () {
     const resp = await request(app)
       .post("/companies")
@@ -117,7 +117,7 @@ describe("GET /companies", function () {
     expect(resp.statusCode).toEqual(500);
   });
 
-  //NEW TESTS
+  //Filter Tests
   test("tests query filters", async function () {
     const resp = await request(app)
       .get("/companies?minEmployees=1&maxEmployees=7000")
@@ -268,14 +268,14 @@ describe("DELETE /companies/:handle", function () {
     expect(resp.statusCode).toEqual(401);
   });
 
-  test("works for users", async function () {
+  test("works for admin", async function () {
     const resp = await request(app)
       .delete(`/companies/c1`)
       .set("authorization", `Bearer ${adminToken}`);
     expect(resp.body).toEqual({ deleted: "c1" });
   });
 
-  test("unauth for anon", async function () {
+  test("unauthorized for anon", async function () {
     const resp = await request(app)
       .delete(`/companies/c1`);
     expect(resp.statusCode).toEqual(401);

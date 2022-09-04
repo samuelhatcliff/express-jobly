@@ -23,6 +23,7 @@ afterAll(commonAfterAll);
 /************************************** POST /users */
 
 describe("POST /users", function () {
+  //Authorization
   test("works for users who are admin: create user non-admin", async function () {
     const resp = await request(app)
       .post("/users")
@@ -115,6 +116,7 @@ describe("POST /users", function () {
     expect(resp.statusCode).toEqual(401);
   });
 
+  //Schema
   test("bad request if missing data", async function () {
     const resp = await request(app)
       .post("/users")

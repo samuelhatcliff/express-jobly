@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jobshema",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+        },
+        "salary": {
+            "type": "integer",
+            "minLength": 10,
+            "maxLength": 100000000
+        },
+        "equity": {
+            "type": "string"
+        },
+        "companyHandle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+        }
+    },
+    "additionalProperties": false,
+    "required": []
+}
