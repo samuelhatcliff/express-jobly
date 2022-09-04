@@ -144,19 +144,11 @@ describe("update", function () {
             title: "new title",
             salary: 1000,
             equity: "0.5",
-            company_handle: "c1"
+            companyHandle: "c1"
         })
     });
 
     test("works: null fields", async function () {
-        // const newJob = {
-        //     id: 3,
-        //     title: "New Job",
-        //     salary: 115000,
-        //     equity: 0,
-        //     company_handle: "c3",
-        // };
-        // await Job.create(newJob);
         const updateDataSetNulls = {
             salary: null,
             equity: null,
@@ -167,7 +159,7 @@ describe("update", function () {
             id: testJobIds[0],
             title: "Job1",
             ...updateDataSetNulls,
-            company_handle: "c1"
+            companyHandle: "c1"
         });
     });
 

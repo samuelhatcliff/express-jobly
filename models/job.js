@@ -137,7 +137,7 @@ class Job {
                                 title, 
                                 salary, 
                                 equity, 
-                                company_handle`;
+                                company_handle AS "companyHandle"`;
         const result = await db.query(querySql, [...values, id]);
         const job = result.rows[0];
 
@@ -152,13 +152,12 @@ class Job {
 
     static async remove(id) {
         try {
-            const result = await db.query(
+            await db.query(
                 `DELETE
                FROM jobs
                WHERE id = $1
                RETURNING id`,
                 [id]);
-            const job = result.rows[0];
         } catch (err) {
             throw new NotFoundError(`No job: ${id}`);
         }
