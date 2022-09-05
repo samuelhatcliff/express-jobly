@@ -141,7 +141,6 @@ describe("GET /companies", function () {
       .get("/companies?name=invalidnameforcompany")
       .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(404);
-    console.log("^66666666", resp.body)
     expect(resp.body).toEqual({
       error: {
         message: "Couldn't find company that matched search criteria.",
@@ -164,6 +163,26 @@ describe("GET /companies/:handle", function () {
         description: "Desc1",
         numEmployees: 1,
         logoUrl: "http://c1.img",
+        jobs: [
+          {
+            "equity": "0.1",
+            "id": expect.any(Number),
+            "salary": 1,
+            "title": "J1",
+          },
+          {
+            "equity": "0.2",
+            "id": expect.any(Number),
+            "salary": 2,
+            "title": "J2",
+          },
+          {
+            "equity": null,
+            "id": expect.any(Number),
+            "salary": 3,
+            "title": "J3",
+          },
+        ]
       },
     });
   });
@@ -177,6 +196,7 @@ describe("GET /companies/:handle", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+        jobs: []
       },
     });
   });
