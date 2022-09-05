@@ -8,6 +8,8 @@ const express = require("express");
 const { ensureLoggedIn, requireAdmin, correctUserOrAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
+const Application = require("../models/application");
+
 const { createToken } = require("../helpers/tokens");
 const userNewSchema = require("../schemas/userNew.json");
 const userUpdateSchema = require("../schemas/userUpdate.json");
@@ -24,7 +26,7 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
+ * Authorization required: admin
  **/
 
 router.post("/", ensureLoggedIn, requireAdmin,
@@ -49,7 +51,7 @@ router.post("/", ensureLoggedIn, requireAdmin,
  *
  * Returns list of all users.
  *
- * Authorization required: login
+ * Authorization required: admin
  **/
 
 router.get("/", ensureLoggedIn, requireAdmin,
@@ -67,7 +69,7 @@ router.get("/", ensureLoggedIn, requireAdmin,
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: correctUser oradmin
  **/
 
 router.get("/:username", ensureLoggedIn, correctUserOrAdmin,
@@ -88,7 +90,7 @@ router.get("/:username", ensureLoggedIn, correctUserOrAdmin,
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: correctUser or admin
  **/
 
 router.patch("/:username", ensureLoggedIn, correctUserOrAdmin,
@@ -107,10 +109,23 @@ router.patch("/:username", ensureLoggedIn, correctUserOrAdmin,
     }
   });
 
+// POST / { username, jobId }  => { applied: jobId }
+// * Authorization required: coorectUser or admin
+
+router.post("/:username/jobs/:id", ensureLoggedIn, correctUserOrAdmin,
+  async function (req, res, next) {
+    try {
+      console.log(req.params.username, req.params.id)
+      const application = await Application.create(req.params.username, parseInt(req.params.id));
+      return res.json(application);
+    } catch (err) {
+      return next(err);
+    }
+  });
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: correctUser or admin
  **/
 
 router.delete("/:username", ensureLoggedIn, correctUserOrAdmin,
